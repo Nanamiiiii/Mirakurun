@@ -10,6 +10,14 @@ RUN apt-get update && \
     npm run build && \
     npm install -g --unsafe-perm --production
 
+WORKDIR /src
+RUN apt-get install -y --no-install-recommends git automake autoconf && \
+    git clone https://github.com/stz2012/recpt1.git && \
+    cd recpt1/recpt1 && \
+    ./autogen.sh && \
+    ./configure --enable-b25 && \
+    make
+
 FROM ${ARCH}node:18.15.0-buster-slim
 WORKDIR /app
 RUN apt-get update && \
@@ -30,5 +38,8 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 COPY --from=build /usr/local/lib/node_modules/mirakurun /app
+COPY --from=build /src/recpt1/recpt1/recpt1 /opt/bin
+COPY --from=build /src/recpt1/recpt1/recpt1ctl /opt/bin
+COPY --from=build /src/recpt1/recpt1/checksignal /opt/bin
 CMD ["./docker/container-init.sh"]
 EXPOSE 40772 9229

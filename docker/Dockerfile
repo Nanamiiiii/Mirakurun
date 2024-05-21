@@ -38,8 +38,8 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 COPY --from=build /usr/local/lib/node_modules/mirakurun /app
-COPY --from=build /src/recpt1/recpt1/recpt1 /opt/bin
-COPY --from=build /src/recpt1/recpt1/recpt1ctl /opt/bin
-COPY --from=build /src/recpt1/recpt1/checksignal /opt/bin
+COPY --from=build /src/recpt1/recpt1/recpt1 /usr/local/bin/
+COPY --from=build /src/recpt1/recpt1/recpt1ctl /usr/local/bin/
+COPY --from=build /src/recpt1/recpt1/checksignal /usr/local/bin/
 CMD ["./docker/container-init.sh"]
 EXPOSE 40772 9229

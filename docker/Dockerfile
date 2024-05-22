@@ -11,6 +11,13 @@ RUN apt-get update && \
     npm install -g --unsafe-perm --production
 
 WORKDIR /src
+RUN apt-get install -y --no-install-recommends cmake libpcsclite1 libpcsclite-dev pkg-config && \
+    git clone https://github.com/tsukumijima/libaribb25.git && \
+    cd libaribb25 && \
+    cmake -B build && cd build && \
+    make && \
+    make install
+
 RUN apt-get install -y --no-install-recommends git automake autoconf && \
     git clone https://github.com/stz2012/recpt1.git && \
     cd recpt1/recpt1 && \
@@ -25,10 +32,12 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         ca-certificates \
         make \
+        cmake \
         gcc \
         g++ \
         pkg-config \
         pcscd \
+        libpcsclite1 \
         libpcsclite-dev \
         libccid \
         libdvbv5-dev \
@@ -37,9 +46,13 @@ RUN apt-get update && \
         && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
 COPY --from=build /usr/local/lib/node_modules/mirakurun /app
 COPY --from=build /src/recpt1/recpt1/recpt1 /usr/local/bin/
 COPY --from=build /src/recpt1/recpt1/recpt1ctl /usr/local/bin/
 COPY --from=build /src/recpt1/recpt1/checksignal /usr/local/bin/
+COPY --from=build /src/libaribb25 /src/libaribb25
+RUN cd /src/libaribb25/build && make install
+
 CMD ["./docker/container-init.sh"]
 EXPOSE 40772 9229

@@ -1,5 +1,7 @@
 ARG ARCH=
 FROM ${ARCH}node:18.15.0-buster AS build
+
+# Build & install mirakurun
 WORKDIR /app
 ENV DOCKER=YES NODE_ENV=production
 ADD . .
@@ -10,21 +12,27 @@ RUN apt-get update && \
     npm run build && \
     npm install -g --unsafe-perm --production
 
+# Build & install recisdb
 WORKDIR /src
-RUN apt-get install -y --no-install-recommends cmake libpcsclite1 libpcsclite-dev pkg-config && \
-    git clone https://github.com/tsukumijima/libaribb25.git && \
-    cd libaribb25 && \
-    cmake -B build && cd build && \
-    make && \
-    make install
+RUN apt-get install -y --no-install-recommends git curl libclang-dev cmake libdvbv5-dev libpcsclite-dev libudev-dev pkg-config && \
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable -y
+RUN git clone --recursive https://github.com/kazuki0824/recisdb-rs.git && \
+    cd recisdb-rs && \
+    /root/.cargo/bin/cargo build -F dvb --release 
 
-RUN apt-get install -y --no-install-recommends git automake autoconf && \
-    git clone https://github.com/stz2012/recpt1.git && \
-    cd recpt1/recpt1 && \
-    ./autogen.sh && \
-    ./configure --enable-b25 && \
-    make
+# Build isdb-scanner
+FROM python:3.11-buster AS py-builder
+WORKDIR /src
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends build-essential git && \
+    pip install poetry
+RUN git clone https://github.com/tsukumijima/ISDBScanner.git && \
+    cd ISDBScanner && \
+    poetry install && \
+    poetry run pyinstaller --onefile --name=isdb-scanner isdb_scanner/__main__.py
 
+# Runner
 FROM ${ARCH}node:18.15.0-buster-slim
 WORKDIR /app
 RUN apt-get update && \
@@ -32,7 +40,6 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         ca-certificates \
         make \
-        cmake \
         gcc \
         g++ \
         pkg-config \
@@ -48,11 +55,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /usr/local/lib/node_modules/mirakurun /app
-COPY --from=build /src/recpt1/recpt1/recpt1 /usr/local/bin/
-COPY --from=build /src/recpt1/recpt1/recpt1ctl /usr/local/bin/
-COPY --from=build /src/recpt1/recpt1/checksignal /usr/local/bin/
-COPY --from=build /src/libaribb25 /src/libaribb25
-RUN cd /src/libaribb25/build && make install
+COPY --from=build /src/recisdb-rs/target/release/recisdb /usr/local/bin/
+COPY --from=py-builder /src/ISDBScanner/dist/isdb-scanner /usr/local/bin/
 
 CMD ["./docker/container-init.sh"]
 EXPOSE 40772 9229

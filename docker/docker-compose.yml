@@ -4,7 +4,7 @@ services:
     build:
       context: ../
       dockerfile: docker/Dockerfile
-    image: chinachu/mirakurun:latest
+    image: nanamiiiii/mirakurun-recisdb:latest
     container_name: mirakurun
     cap_add:
       - SYS_ADMIN

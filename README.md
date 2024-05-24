@@ -1,3 +1,17 @@
+# Mirakurun-recisdb
+チューナーコマンドとして[recisdb-rs](https://github.com/kazuki0824/recisdb-rs)をバンドルしたMirakurun Docker Image
+
+[![dockeri.co](https://dockeri.co/image/nanamiiiii/mirakurun-recisdb)][docker-url]
+
+## 追加したもの
+- [recisdb-rs](https://github.com/kazuki0824/recisdb-rs)
+  - `recpt1`, `recdvb`等のリプレイス
+  - b25デコーダーの機能も持つ
+- [ISDBScanner](https://github.com/tsukumijima/ISDBScanner)
+  - recisdbを使うチャンネルスキャナー
+
+---
+
 [![Mirakurun](https://gist.githubusercontent.com/kanreisa/0ab27d7771e97edce5a24cc81b9b8ce6/raw/e50683f1c4e7d1a13e9ef468f8cc945b0dbc853c/logo-mirakurun.svg)](https://github.com/Chinachu/Mirakurun)
 
 # Mirakurun

@@ -1,7 +1,7 @@
 # Mirakurun-recisdb
 チューナーコマンドとして[recisdb-rs](https://github.com/kazuki0824/recisdb-rs)をバンドルしたMirakurun Docker Image
 
-[![dockeri.co](https://dockeri.co/image/nanamiiiii/mirakurun-recisdb)][docker-url]
+[![dockeri.co](https://dockerico.blankenship.io/image/nanamiiiii/mirakurun-recisdb)](https://hub.docker.com/r/nanamiiiii/mirakurun-recisdb)
 
 ## 追加したもの
 - [recisdb-rs](https://github.com/kazuki0824/recisdb-rs)
